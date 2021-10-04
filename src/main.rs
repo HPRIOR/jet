@@ -2,14 +2,14 @@ mod jet_brains_app;
 mod config;
 mod ui;
 mod execute_command;
+mod file_count;
 
-use std::error::Error;
 use std::process;
 use structopt::StructOpt;
 use config::get_apps;
 use crate::ui::display_ui;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() {
     let args: ProcessArgs = ProcessArgs::from_args();
     let path_str = args.file_path.to_str().unwrap_or_else(|| {
         eprintln!("unable to parse 'open' argument");
@@ -20,8 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let jet_brains_apps = get_apps(&installed_apps);
 
     display_ui(&jet_brains_apps, path_str);
-
-    Ok(())
+    process::exit(0);
 }
 
 
