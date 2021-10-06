@@ -1,7 +1,8 @@
 use std::path::PathBuf;
 use crate::jet_brains_app::JetBrainsApp::{Clion, Datagrip, Intellij, Pycharm, Rider, Webstorm};
+use strum_macros::EnumIter; // 0.17.1
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, EnumIter, Eq, Hash, Copy)]
 pub enum JetBrainsApp {
     Clion,
     Datagrip,
@@ -36,6 +37,18 @@ impl JetBrainsApp {
     }
 }
 
+impl Clone for JetBrainsApp{
+    fn clone(&self) -> Self {
+        match self {
+            Clion => JetBrainsApp::Clion,
+            Datagrip => JetBrainsApp::Datagrip,
+            Intellij => JetBrainsApp::Intellij,
+            Pycharm => JetBrainsApp::Pycharm,
+            Rider => JetBrainsApp::Rider,
+            Webstorm => JetBrainsApp::Webstorm
+        }
+    }
+}
 
 #[cfg(test)]
 mod jet_brains_app_tests{
