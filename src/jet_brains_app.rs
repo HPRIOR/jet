@@ -38,7 +38,7 @@ impl JetBrainsApp {
 }
 
 impl Clone for JetBrainsApp{
-    fn clone(&self) -> Self {
+    fn clone(&self) -> Self { // short hand for JetBrainsApp
         match self {
             Clion => JetBrainsApp::Clion,
             Datagrip => JetBrainsApp::Datagrip,
