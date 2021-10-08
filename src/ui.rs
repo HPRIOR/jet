@@ -5,7 +5,7 @@ use crate::execute_command::open_jetbrains_app;
 
 pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
     display_selection(jet_brains_apps);
-    println!("enter app number: ");
+    println!("Enter app number: ");
     loop {
         let mut buffer = String::new();
         std::io::stdin().read_line(&mut buffer).unwrap_or_else(|e| {
