@@ -1,6 +1,10 @@
 use std::path::PathBuf;
+
+use strum_macros::EnumIter;
+
 use crate::jet_brains_app::JetBrainsApp::{Clion, Datagrip, Intellij, Pycharm, Rider, Webstorm};
-use strum_macros::EnumIter; // 0.17.1
+
+// 0.17.1
 
 #[derive(Debug, PartialEq, EnumIter, Eq, Hash, Copy)]
 pub enum JetBrainsApp {
@@ -37,7 +41,7 @@ impl JetBrainsApp {
     }
 }
 
-impl Clone for JetBrainsApp{
+impl Clone for JetBrainsApp {
     fn clone(&self) -> Self { // short hand for JetBrainsApp
         match self {
             Clion => JetBrainsApp::Clion,
@@ -51,35 +55,33 @@ impl Clone for JetBrainsApp{
 }
 
 #[cfg(test)]
-mod jet_brains_app_tests{
+mod jet_brains_app_tests {
     use crate::jet_brains_app::JetBrainsApp;
 
     #[test]
-    fn new_will_create_appropriate_enum(){
+    fn new_will_create_appropriate_enum() {
         let sut = JetBrainsApp::new("clion");
         let app = sut.unwrap();
         assert_eq!(app, JetBrainsApp::Clion)
     }
 
     #[test]
-    fn new_will_accept_uppercase_arg(){
+    fn new_will_accept_uppercase_arg() {
         let sut = JetBrainsApp::new("CLiOn");
         let app = sut.unwrap();
         assert_eq!(app, JetBrainsApp::Clion)
     }
 
     #[test]
-    fn get_path_will_return_correct_path(){
+    fn get_path_will_return_correct_path() {
         let sut = JetBrainsApp::new("clion");
         let app = sut.unwrap();
         assert_eq!("Clion.app", app.get_path().to_str().unwrap())
     }
 
-   #[test]
-    fn will_return_none_bad_arg(){
-       let sut = JetBrainsApp::new("blion");
-       assert!(sut.is_none())
-   }
-
-
+    #[test]
+    fn will_return_none_bad_arg() {
+        let sut = JetBrainsApp::new("blion");
+        assert!(sut.is_none())
+    }
 }

@@ -1,3 +1,14 @@
+use std::process;
+
+use structopt::StructOpt;
+
+use config::get_apps;
+
+use crate::choose_app::get_app_with_most_ext;
+use crate::execute_command::open_jetbrains_app;
+use crate::file_count::get_app_points;
+use crate::ui::display_ui;
+
 mod jet_brains_app;
 mod config;
 mod ui;
@@ -5,14 +16,12 @@ mod execute_command;
 mod file_count;
 mod choose_app;
 
-use std::process;
-use structopt::StructOpt;
-use config::get_apps;
-use crate::choose_app::get_app_with_most_ext;
-use crate::execute_command::open_jetbrains_app;
-use crate::file_count::get_app_points;
-use crate::ui::display_ui;
-
+// TODO: lift all UI elements into main, test what's left
+// TODO: remove -o argument
+// TODO: find a way to add configuration for file_ext -> App
+// TODO: scan directory for installed jetbrains apps
+// TODO: integration tests
+// TODO: more unit test
 fn main() {
     let args: ProcessArgs = ProcessArgs::from_args();
     let path_str = args.file_path.to_str().unwrap_or_else(|| {

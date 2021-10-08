@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use std::process::{Command, Output};
+
 use crate::jet_brains_app::JetBrainsApp;
 
 pub fn open_jetbrains_app(path: &PathBuf, app: &JetBrainsApp) -> Output {

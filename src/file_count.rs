@@ -3,8 +3,11 @@ use std::error::Error;
 use std::fs;
 use std::fs::{DirEntry, ReadDir};
 use std::path::PathBuf;
+
 use crate::jet_brains_app::JetBrainsApp;
-use crate::jet_brains_app::JetBrainsApp::{Clion, Datagrip, Intellij, Pycharm, Rider, Webstorm}; // 0.17.1
+use crate::jet_brains_app::JetBrainsApp::{Clion, Datagrip, Intellij, Pycharm, Rider, Webstorm};
+
+// 0.17.1
 
 pub fn get_app_points<'a>(file_path: &PathBuf, apps: &'a Vec<JetBrainsApp>)
                           -> Result<HashMap<&'a JetBrainsApp, u32>, Box<dyn Error>> {

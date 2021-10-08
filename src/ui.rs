@@ -1,7 +1,8 @@
 use std::path::PathBuf;
 use std::process;
-use crate::jet_brains_app::JetBrainsApp;
+
 use crate::execute_command::open_jetbrains_app;
+use crate::jet_brains_app::JetBrainsApp;
 
 pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
     display_selection(jet_brains_apps);

@@ -1,31 +1,30 @@
 use std::collections::HashMap;
+
 use crate::jet_brains_app::JetBrainsApp;
 
-struct AppPoints<'a>{
-    app:  &'a JetBrainsApp,
-    points: u32
+struct AppPoints<'a> {
+    app: &'a JetBrainsApp,
+    points: u32,
 }
 
 pub fn get_app_with_most_ext<'a>(app_points: &HashMap<&'a JetBrainsApp, u32>) -> Result<&'a JetBrainsApp, &'a str> {
     let sorted_apps = sort_apps(&app_points.clone());
     let top_app = &sorted_apps[sorted_apps.len() - 1];
     let next_app = &sorted_apps[sorted_apps.len() - 2];
-    if top_app.points == next_app.points{
-         Err("Search inconclusive")
+    if top_app.points == next_app.points {
+        Err("Search inconclusive")
     } else {
         Ok(top_app.app)
     }
-
-
 }
 
 fn sort_apps<'a>(app_points: &HashMap<&'a JetBrainsApp, u32>) -> Vec<AppPoints<'a>> {
     let mut key_vals: Vec<AppPoints> = app_points
         .into_iter()
         .map(|(key, val)| {
-            AppPoints{app: key, points: *val}
+            AppPoints { app: key, points: *val }
         }).collect();
-    key_vals.sort_by_key(|ap| ap.points );
+    key_vals.sort_by_key(|ap| ap.points);
     key_vals
 }
 
@@ -34,6 +33,7 @@ fn sort_apps<'a>(app_points: &HashMap<&'a JetBrainsApp, u32>) -> Vec<AppPoints<'
 mod tests {
     mod test_sort_apps {
         use std::collections::HashMap;
+
         use crate::choose_app::sort_apps;
         use crate::jet_brains_app::JetBrainsApp;
 
