@@ -1,8 +1,9 @@
+use std::path::PathBuf;
 use std::process;
 use crate::jet_brains_app::JetBrainsApp;
 use crate::execute_command::open_jetbrains_app;
 
-pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path_str: &str) {
+pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
     display_selection(jet_brains_apps);
     println!("enter app number: ");
     loop {
@@ -13,7 +14,7 @@ pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path_str: &str) {
         });
         match parse_input(buffer.as_str()) {
             Ok(input) => {
-                match handle_parsed_input(&jet_brains_apps, path_str, input) {
+                match handle_parsed_input(&jet_brains_apps, path, input) {
                     Ok(_) => { break; }
                     Err(message) => { println!("{}", message); }
                 }
@@ -26,10 +27,10 @@ pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path_str: &str) {
     }
 }
 
-fn handle_parsed_input<'a>(jet_brains_apps: &'a Vec<JetBrainsApp>, path_str: &'a str, i: u8) -> Result<(), &'a str> {
+fn handle_parsed_input<'a>(jet_brains_apps: &'a Vec<JetBrainsApp>, path: &'a PathBuf, i: u8) -> Result<(), &'a str> {
     let num_of_apps = jet_brains_apps.len() as u8;
     if i > 0 && i <= num_of_apps {
-        open_jetbrains_app(path_str, &jet_brains_apps[(i - 1) as usize]);
+        open_jetbrains_app(path, &jet_brains_apps[(i - 1) as usize]);
         Ok(())
     } else {
         Err("please enter a value within the correct range")

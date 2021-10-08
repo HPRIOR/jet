@@ -15,30 +15,40 @@ pub fn get_app_points<'a>(file_path: &PathBuf, apps: &'a Vec<JetBrainsApp>)
     Ok(app_points)
 }
 
-fn recurse_directories<'a>(
-    mut app_points: &mut HashMap<&'a JetBrainsApp, u32>,
-    app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
-    files: ReadDir)
-    -> Result<(), Box<dyn Error>> {
-    let mut recurse = |dir: ReadDir| -> Result<(), Box<dyn Error>> {
-        for dir_result in dir {
-            let entry = dir_result?.file_name();
-            let entry_str = entry.to_str().unwrap().split(".");
-            entry_str.for_each(|file_str| modify_app_points(&mut app_points, &app_ext, file_str))
-        };
-        Ok(())
+fn recurse_directories<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
+                           app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
+                           files: ReadDir) -> Result<(), Box<dyn Error>> {
+    for dir_result in files {
+        let dir_entry = dir_result?;
+        let meta_data = dir_entry.metadata()?;
+        if meta_data.is_file() {
+            get_count_from_file_ext(app_points, app_ext, &dir_entry)
+        }
+        if meta_data.is_dir() {
+            if let Ok(read_dir) = fs::read_dir(dir_entry.path()) {
+                recurse_directories(app_points, app_ext, read_dir).unwrap()
+            }
+        }
     };
-
-    recurse(files)
+    Ok(())
 }
 
-// for file in files {
-//     let entry = file?.file_name();
-//     let entry_str = entry.to_str().unwrap().split(".");
-//     entry_str.for_each(|file_str| modify_app_points(&mut app_points, &app_ext, file_str))
-// };
-// Ok(())
-// }
+fn get_count_from_file_ext<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
+                               app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
+                               dir_entry: &DirEntry) -> () {
+    let entry_file_name: Vec<String> =
+        dir_entry
+            .file_name()
+            .to_str()
+            .unwrap()
+            .split(".")
+            .map(|s| s.to_string())
+            .collect();
+
+    if let Some(ext) = entry_file_name.last() {
+        modify_app_points(app_points, app_ext, ext)
+    }
+}
 
 fn get_app_points_map(apps: &Vec<JetBrainsApp>) -> HashMap<&JetBrainsApp, u32> {
     let mut app_points: HashMap<&JetBrainsApp, u32> = HashMap::new();
@@ -50,11 +60,11 @@ fn get_app_points_map(apps: &Vec<JetBrainsApp>) -> HashMap<&JetBrainsApp, u32> {
 
 fn modify_app_points<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
                          app_ext_map: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
-                         ext: &str)
-                         -> () {
+                         ext: &str) -> () {
     for (app, extensions) in app_ext_map {
         if extensions.contains(ext) {
             *app_points.get_mut(*app).unwrap() += 1;
+            return;
         }
     }
 }
@@ -120,10 +130,8 @@ fn get_app_ext_hashmaps(apps: &Vec<JetBrainsApp>)
 #[cfg(test)]
 mod file_count_tests {
     mod modify_app_points {
-        use std::collections::HashMap;
-        use crate::file_count::{get_app_ext_hashmaps, get_app_points, get_app_points_map, modify_app_points};
+        use crate::file_count::{get_app_ext_hashmaps, get_app_points_map, modify_app_points};
         use crate::jet_brains_app::JetBrainsApp;
-
 
         #[test]
         fn app_points_are_updated_with_correct_ext() {
@@ -147,7 +155,6 @@ mod file_count_tests {
     }
 
     mod get_app_points {
-        use std::path::PathBuf;
         use crate::file_count::get_app_points;
         use crate::jet_brains_app::JetBrainsApp;
 
