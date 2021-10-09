@@ -25,7 +25,7 @@ impl JetBrainsApp {
             "pycharm" => Some(Pycharm),
             "rider" => Some(Rider),
             "webstorm" => Some(Webstorm),
-            _ => None
+            _ => None,
         }
     }
 
@@ -37,19 +37,22 @@ impl JetBrainsApp {
             Pycharm => ["PyCharm.app"],
             Rider => ["Rider.app"],
             Webstorm => ["WebStorm.app"],
-        }.iter().collect()
+        }
+        .iter()
+        .collect()
     }
 }
 
 impl Clone for JetBrainsApp {
-    fn clone(&self) -> Self { // short hand for JetBrainsApp
+    fn clone(&self) -> Self {
+        // short hand for JetBrainsApp
         match self {
             Clion => JetBrainsApp::Clion,
             Datagrip => JetBrainsApp::Datagrip,
             Intellij => JetBrainsApp::Intellij,
             Pycharm => JetBrainsApp::Pycharm,
             Rider => JetBrainsApp::Rider,
-            Webstorm => JetBrainsApp::Webstorm
+            Webstorm => JetBrainsApp::Webstorm,
         }
     }
 }

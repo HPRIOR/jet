@@ -2,15 +2,15 @@ use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fs;
 use std::fs::{DirEntry, ReadDir};
-use std::path::PathBuf;
+use std::path::Path;
 
 use crate::jet_brains_app::JetBrainsApp;
 use crate::jet_brains_app::JetBrainsApp::{Clion, Datagrip, Intellij, Pycharm, Rider, Webstorm};
 
-// 0.17.1
-
-pub fn get_app_points<'a>(file_path: &PathBuf, apps: &'a Vec<JetBrainsApp>)
-                          -> Result<HashMap<&'a JetBrainsApp, u32>, Box<dyn Error>> {
+pub fn get_app_points<'a>(
+    file_path: &Path,
+    apps: &'a [JetBrainsApp],
+) -> Result<HashMap<&'a JetBrainsApp, u32>, Box<dyn Error>> {
     let mut app_points = get_app_points_map(apps);
     let app_ext = get_app_ext_hashmaps(apps);
     let files = fs::read_dir(file_path)?;
@@ -18,9 +18,11 @@ pub fn get_app_points<'a>(file_path: &PathBuf, apps: &'a Vec<JetBrainsApp>)
     Ok(app_points)
 }
 
-fn recurse_directories<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
-                           app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
-                           files: ReadDir) -> Result<(), Box<dyn Error>> {
+fn recurse_directories<'a>(
+    app_points: &mut HashMap<&'a JetBrainsApp, u32>,
+    app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
+    files: ReadDir,
+) -> Result<(), Box<dyn Error>> {
     for dir_result in files {
         let dir_entry = dir_result?;
         let meta_data = dir_entry.metadata()?;
@@ -32,28 +34,29 @@ fn recurse_directories<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
                 recurse_directories(app_points, app_ext, read_dir).unwrap()
             }
         }
-    };
+    }
     Ok(())
 }
 
-fn get_count_from_file_ext<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
-                               app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
-                               dir_entry: &DirEntry) -> () {
-    let entry_file_name: Vec<String> =
-        dir_entry
-            .file_name()
-            .to_str()
-            .unwrap()
-            .split(".")
-            .map(|s| s.to_string())
-            .collect();
+fn get_count_from_file_ext<'a>(
+    app_points: &mut HashMap<&'a JetBrainsApp, u32>,
+    app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
+    dir_entry: &DirEntry,
+) {
+    let entry_file_name: Vec<String> = dir_entry
+        .file_name()
+        .to_str()
+        .unwrap()
+        .split('.')
+        .map(|s| s.to_string())
+        .collect();
 
     if let Some(ext) = entry_file_name.last() {
         modify_app_points(app_points, app_ext, ext)
     }
 }
 
-fn get_app_points_map(apps: &Vec<JetBrainsApp>) -> HashMap<&JetBrainsApp, u32> {
+fn get_app_points_map(apps: &[JetBrainsApp]) -> HashMap<&JetBrainsApp, u32> {
     let mut app_points: HashMap<&JetBrainsApp, u32> = HashMap::new();
     apps.iter().for_each(|app| {
         app_points.insert(app, 0);
@@ -61,9 +64,11 @@ fn get_app_points_map(apps: &Vec<JetBrainsApp>) -> HashMap<&JetBrainsApp, u32> {
     app_points
 }
 
-fn modify_app_points<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
-                         app_ext_map: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
-                         ext: &str) -> () {
+fn modify_app_points<'a>(
+    app_points: &mut HashMap<&'a JetBrainsApp, u32>,
+    app_ext_map: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
+    ext: &str,
+) {
     for (app, extensions) in app_ext_map {
         if extensions.contains(ext) {
             *app_points.get_mut(*app).unwrap() += 1;
@@ -72,58 +77,35 @@ fn modify_app_points<'a>(app_points: &mut HashMap<&'a JetBrainsApp, u32>,
     }
 }
 
-fn get_app_ext_hashmaps(apps: &Vec<JetBrainsApp>)
-                        -> HashMap<&JetBrainsApp, HashSet<&'static str>> {
+fn get_app_ext_hashmaps(apps: &[JetBrainsApp]) -> HashMap<&JetBrainsApp, HashSet<&'static str>> {
     let mut result = HashMap::new();
     for app in apps {
         match app {
             Clion => {
-                result.insert(app, vec![
-                    "c",
-                    "cpp",
-                    "rs",
-                    "h",
-                ].into_iter().collect());
+                result.insert(app, vec!["c", "cpp", "rs", "h"].into_iter().collect());
             }
             Datagrip => {
-                result.insert(app, vec![
-                    "db",
-                    "dbf",
-                    "sql",
-                ].into_iter().collect());
+                result.insert(app, vec!["db", "dbf", "sql"].into_iter().collect());
             }
             Intellij => {
-                result.insert(app, vec![
-                    "groovy",
-                    "java",
-                    "jar",
-                    "kt",
-                ].into_iter().collect());
+                result.insert(
+                    app,
+                    vec!["groovy", "java", "jar", "kt"].into_iter().collect(),
+                );
             }
             Pycharm => {
-                result.insert(app, vec![
-                    "py"
-                ].into_iter().collect());
+                result.insert(app, vec!["py"].into_iter().collect());
             }
             Rider => {
-                result.insert(app, vec![
-                    "cs",
-                    "ashx",
-                    "asp",
-                    "asmx",
-                    "aspx",
-                    "asx",
-                    "axd",
-                    "vb",
-                ].into_iter().collect());
+                result.insert(
+                    app,
+                    vec!["cs", "ashx", "asp", "asmx", "aspx", "asx", "axd", "vb"]
+                        .into_iter()
+                        .collect(),
+                );
             }
             Webstorm => {
-                result.insert(app, vec![
-                    "ts",
-                    "js",
-                    "html",
-                    "css",
-                ].into_iter().collect());
+                result.insert(app, vec!["ts", "js", "html", "css"].into_iter().collect());
             }
         }
     }
@@ -166,10 +148,12 @@ mod file_count_tests {
             let mut file_path = std::env::current_dir().unwrap();
             file_path.push("resources/test_single_files");
 
-            let apps: Vec<JetBrainsApp> = vec!["clion", "pycharm", "rider", "intellij", "datagrip", "webstorm"]
-                .into_iter()
-                .map(|s| JetBrainsApp::new(s).unwrap())
-                .collect();
+            let apps: Vec<JetBrainsApp> = vec![
+                "clion", "pycharm", "rider", "intellij", "datagrip", "webstorm",
+            ]
+            .into_iter()
+            .map(|s| JetBrainsApp::new(s).unwrap())
+            .collect();
 
             let sut = get_app_points(&file_path, &apps).unwrap();
             assert_eq!(sut[&JetBrainsApp::Clion], 4);
@@ -185,10 +169,12 @@ mod file_count_tests {
             let mut file_path = std::env::current_dir().unwrap();
             file_path.push("resources/test_files_tree");
 
-            let apps: Vec<JetBrainsApp> = vec!["clion", "pycharm", "rider", "intellij", "datagrip", "webstorm"]
-                .into_iter()
-                .map(|s| JetBrainsApp::new(s).unwrap())
-                .collect();
+            let apps: Vec<JetBrainsApp> = vec![
+                "clion", "pycharm", "rider", "intellij", "datagrip", "webstorm",
+            ]
+            .into_iter()
+            .map(|s| JetBrainsApp::new(s).unwrap())
+            .collect();
 
             let sut = get_app_points(&file_path, &apps).unwrap();
             assert_eq!(sut[&JetBrainsApp::Clion], 4);

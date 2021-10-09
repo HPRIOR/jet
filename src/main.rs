@@ -9,12 +9,12 @@ use crate::execute_command::open_jetbrains_app;
 use crate::file_count::get_app_points;
 use crate::ui::display_ui;
 
-mod jet_brains_app;
+mod choose_app;
 mod config;
-mod ui;
 mod execute_command;
 mod file_count;
-mod choose_app;
+mod jet_brains_app;
+mod ui;
 
 // TODO: lift all UI elements into main, test what's left
 // TODO: remove -o argument
@@ -31,16 +31,18 @@ fn main() {
     let mut current_directory = std::env::current_dir().unwrap();
     current_directory.push(path_str);
 
-    let jet_brains_apps =
-        get_apps(&vec!["rider", "intellij", "clion", "datagrip", "pycharm", "webstorm"]);
+    let jet_brains_apps = get_apps(&[
+        "rider", "intellij", "clion", "datagrip", "pycharm", "webstorm",
+    ]);
 
-    let app_points =
-        get_app_points(&current_directory, &jet_brains_apps);
+    let app_points = get_app_points(&current_directory, &jet_brains_apps);
 
     match app_points {
         Ok(points) => {
             match get_app_with_most_ext(&points) {
-                Ok(app) => { open_jetbrains_app(&current_directory, app); }
+                Ok(app) => {
+                    open_jetbrains_app(&current_directory, app);
+                }
                 Err(err_msg) => {
                     eprint!("{}", err_msg);
                     display_ui(&jet_brains_apps, &current_directory);
@@ -54,7 +56,6 @@ fn main() {
     }
     process::exit(0);
 }
-
 
 #[derive(StructOpt, Debug)]
 struct ProcessArgs {

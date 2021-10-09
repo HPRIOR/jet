@@ -1,12 +1,11 @@
 use crate::jet_brains_app::JetBrainsApp;
 
-pub fn get_apps(installed_apps: &Vec<&str>) -> Vec<JetBrainsApp> {
+pub fn get_apps(installed_apps: &[&str]) -> Vec<JetBrainsApp> {
     installed_apps
         .iter()
         .filter_map(|app| JetBrainsApp::new(app))
         .collect()
 }
-
 
 #[cfg(test)]
 mod config_tests {
@@ -14,7 +13,9 @@ mod config_tests {
 
     #[test]
     fn all_installed_apps_are_valid() {
-        let installed_apps = vec!["rider", "intellij", "clion", "datagrip", "pycharm", "webstorm"];
+        let installed_apps = vec![
+            "rider", "intellij", "clion", "datagrip", "pycharm", "webstorm",
+        ];
         let sut = get_apps(&installed_apps);
         assert_eq!(installed_apps.len(), sut.len())
     }

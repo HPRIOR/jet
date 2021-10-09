@@ -1,10 +1,10 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::process;
 
 use crate::execute_command::open_jetbrains_app;
 use crate::jet_brains_app::JetBrainsApp;
 
-pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
+pub fn display_ui(jet_brains_apps: &[JetBrainsApp], path: &Path) {
     display_selection(jet_brains_apps);
     println!("Enter app number: ");
     loop {
@@ -14,12 +14,14 @@ pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
             process::exit(1)
         });
         match parse_input(buffer.as_str()) {
-            Ok(input) => {
-                match handle_parsed_input(&jet_brains_apps, path, input) {
-                    Ok(_) => { break; }
-                    Err(message) => { println!("{}", message); }
+            Ok(input) => match handle_parsed_input(jet_brains_apps, path, input) {
+                Ok(_) => {
+                    break;
                 }
-            }
+                Err(message) => {
+                    println!("{}", message);
+                }
+            },
             Err(message) => {
                 println!("{}", message);
             }
@@ -28,7 +30,11 @@ pub fn display_ui(jet_brains_apps: &Vec<JetBrainsApp>, path: &PathBuf) {
     }
 }
 
-fn handle_parsed_input<'a>(jet_brains_apps: &'a Vec<JetBrainsApp>, path: &'a PathBuf, i: u8) -> Result<(), &'a str> {
+fn handle_parsed_input<'a>(
+    jet_brains_apps: &'a [JetBrainsApp],
+    path: &'a Path,
+    i: u8,
+) -> Result<(), &'a str> {
     let num_of_apps = jet_brains_apps.len() as u8;
     if i > 0 && i <= num_of_apps {
         open_jetbrains_app(path, &jet_brains_apps[(i - 1) as usize]);
@@ -39,23 +45,17 @@ fn handle_parsed_input<'a>(jet_brains_apps: &'a Vec<JetBrainsApp>, path: &'a Pat
 }
 
 fn parse_input(input: &str) -> Result<u8, &str> {
-    let parsed_string = input
-        .to_string()
-        .replace('\n', "")
-        .parse();
+    let parsed_string = input.to_string().replace('\n', "").parse();
     match parsed_string {
         Ok(result) => Ok(result),
-        Err(_) => Err("Please enter a valid number")
+        Err(_) => Err("Please enter a valid number"),
     }
 }
 
-fn display_selection(jet_brains_apps: &Vec<JetBrainsApp>) {
-    jet_brains_apps
-        .into_iter()
-        .enumerate()
-        .for_each(|(i, app)| {
-            print!("{:?} ({}) \n", app, i + 1);
-        })
+fn display_selection(jet_brains_apps: &[JetBrainsApp]) {
+    jet_brains_apps.iter().enumerate().for_each(|(i, app)| {
+        println!("{:?} ({}) \n", app, i + 1);
+    })
 }
 
 #[cfg(test)]
