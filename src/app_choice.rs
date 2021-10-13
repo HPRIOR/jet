@@ -1,11 +1,9 @@
-use std::path::Path;
 use std::process;
 
-use crate::execute_command::open_jetbrains_app;
 use crate::jet_brains_app::JetBrainsApp;
 
 // return path instead
-pub fn get_selected_app<'a>(jet_brains_apps: &'a [JetBrainsApp], path: &Path) -> &'a JetBrainsApp {
+pub fn get_selected_app(jet_brains_apps: &[JetBrainsApp]) -> &JetBrainsApp {
     println!("Enter app number: ");
     loop {
         let mut buffer = String::new();
@@ -16,24 +14,10 @@ pub fn get_selected_app<'a>(jet_brains_apps: &'a [JetBrainsApp], path: &Path) ->
         if let Ok(parsed_input) = parse_input(buffer.as_str()) {
             let num_of_apps = jet_brains_apps.len() as u8;
             if parsed_input > 0 && parsed_input <= num_of_apps {
-                return &jet_brains_apps[( parsed_input - 1) as usize]
+                return &jet_brains_apps[(parsed_input - 1) as usize];
             }
         }
         buffer.clear();
-    }
-}
-
-fn handle_parsed_input<'a>(
-    jet_brains_apps: &'a [JetBrainsApp],
-    path: &'a Path,
-    i: u8,
-) -> Result<(), &'a str> {
-    let num_of_apps = jet_brains_apps.len() as u8;
-    if i > 0 && i <= num_of_apps {
-        open_jetbrains_app(path, &jet_brains_apps[(i - 1) as usize]);
-        Ok(())
-    } else {
-        Err("please enter a value within the correct range")
     }
 }
 
@@ -43,12 +27,6 @@ fn parse_input(input: &str) -> Result<u8, &str> {
         Ok(result) => Ok(result),
         Err(_) => Err("Please enter a valid number"),
     }
-}
-
-fn display_selection(jet_brains_apps: &[JetBrainsApp]) {
-    jet_brains_apps.iter().enumerate().for_each(|(i, app)| {
-        println!("{:?} ({}) \n", app, i + 1);
-    })
 }
 
 #[cfg(test)]

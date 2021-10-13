@@ -27,7 +27,7 @@ fn recurse_directories<'a>(
         let dir_entry = dir_result?;
         let meta_data = dir_entry.metadata()?;
         if meta_data.is_file() {
-            get_count_from_file_ext(app_points, app_ext, &dir_entry)
+            update_count_with_file_ext(app_points, app_ext, &dir_entry)
         }
         if meta_data.is_dir() {
             if let Ok(read_dir) = fs::read_dir(dir_entry.path()) {
@@ -38,7 +38,7 @@ fn recurse_directories<'a>(
     Ok(())
 }
 
-fn get_count_from_file_ext<'a>(
+fn update_count_with_file_ext<'a>(
     app_points: &mut HashMap<&'a JetBrainsApp, u32>,
     app_ext: &HashMap<&'a JetBrainsApp, HashSet<&'static str>>,
     dir_entry: &DirEntry,
@@ -165,7 +165,7 @@ mod file_count_tests {
         }
 
         #[test]
-        fn with_files_tree_correct_app_points_are_given() {
+        fn with_file_tree_correct_app_points_are_given() {
             let mut file_path = std::env::current_dir().unwrap();
             file_path.push("resources/test_files_tree");
 
