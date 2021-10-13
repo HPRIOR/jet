@@ -4,17 +4,17 @@ use structopt::StructOpt;
 
 use config::get_apps;
 
-use crate::choose_app::get_app_with_most_ext;
+use crate::generate_app_selection::get_app_with_most_ext;
 use crate::execute_command::open_jetbrains_app;
 use crate::file_count::get_app_points;
-use crate::ui::display_ui;
+use crate::app_choice::get_selected_app;
 
-mod choose_app;
+mod generate_app_selection;
 mod config;
 mod execute_command;
 mod file_count;
 mod jet_brains_app;
-mod ui;
+mod app_choice;
 
 // TODO: lift all UI elements into main, test what's left
 // TODO: remove -o argument
@@ -40,12 +40,14 @@ fn main() {
     match app_points {
         Ok(points) => {
             match get_app_with_most_ext(&points) {
-                Ok(app) => {
-                    open_jetbrains_app(&current_directory, app);
+                Ok(generated) => {
+                    open_jetbrains_app(&current_directory, generated);
                 }
-                Err(err_msg) => {
-                    eprint!("{}", err_msg);
-                    display_ui(&jet_brains_apps, &current_directory);
+                Err(inconclusive_message) => {
+                    eprint!("{}", inconclusive_message);
+                    let selected_app = get_selected_app(&jet_brains_apps, &current_directory);
+                    open_jetbrains_app(&current_directory, selected_app);
+
                 }
             };
         }

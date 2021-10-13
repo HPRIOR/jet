@@ -4,8 +4,8 @@ use std::process;
 use crate::execute_command::open_jetbrains_app;
 use crate::jet_brains_app::JetBrainsApp;
 
-pub fn display_ui(jet_brains_apps: &[JetBrainsApp], path: &Path) {
-    display_selection(jet_brains_apps);
+// return path instead
+pub fn get_selected_app<'a>(jet_brains_apps: &'a [JetBrainsApp], path: &Path) -> &'a JetBrainsApp {
     println!("Enter app number: ");
     loop {
         let mut buffer = String::new();
@@ -13,19 +13,12 @@ pub fn display_ui(jet_brains_apps: &[JetBrainsApp], path: &Path) {
             eprintln!("{}", e);
             process::exit(1)
         });
-        match parse_input(buffer.as_str()) {
-            Ok(input) => match handle_parsed_input(jet_brains_apps, path, input) {
-                Ok(_) => {
-                    break;
-                }
-                Err(message) => {
-                    println!("{}", message);
-                }
-            },
-            Err(message) => {
-                println!("{}", message);
+        if let Ok(parsed_input) = parse_input(buffer.as_str()) {
+            let num_of_apps = jet_brains_apps.len() as u8;
+            if parsed_input > 0 && parsed_input <= num_of_apps {
+                return &jet_brains_apps[( parsed_input - 1) as usize]
             }
-        };
+        }
         buffer.clear();
     }
 }
@@ -62,7 +55,7 @@ fn display_selection(jet_brains_apps: &[JetBrainsApp]) {
 mod tests {
     // import names from outer scope
     mod test_parse_input {
-        use crate::ui::parse_input;
+        use crate::app_choice::parse_input;
 
         #[test]
         fn parses_single_character() {

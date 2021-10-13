@@ -37,7 +37,7 @@ mod tests {
     mod test_sort_apps {
         use std::collections::HashMap;
 
-        use crate::choose_app::sort_apps;
+        use crate::generate_app_selection::sort_apps;
         use crate::jet_brains_app::JetBrainsApp;
 
         #[test]
