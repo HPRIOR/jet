@@ -1,48 +1,32 @@
-use std::process;
+use std::error::Error;
+use std::path::{Path, PathBuf};
 
 use config::get_apps;
 
 use crate::app_choice::get_selected_app;
-use crate::execute_command::open_jetbrains_app;
-use crate::file_count::get_app_points;
-use crate::generate_app_selection::get_app_with_most_ext;
-use crate::path_getter::get_path;
+use crate::dir_scanner::get_app_points;
+use crate::top_app_calc::get_app_with_most_ext;
 
 mod app_choice;
 mod config;
-mod execute_command;
-mod file_count;
-mod generate_app_selection;
+mod dir_scanner;
+mod top_app_calc;
 mod jet_brains_app;
-mod path_getter;
+mod AppPoints;
 
-pub fn run(){
-    let current_directory = path_getter::get_path();
-    println!("{:?}", current_directory);
 
+pub fn jet(path_arg: &Path) -> Result<PathBuf, Box<dyn Error>> {
     let jet_brains_apps = get_apps(&[
         "rider", "intellij", "clion", "datagrip", "pycharm", "webstorm",
     ]);
 
-    let app_points = get_app_points(&current_directory, &jet_brains_apps);
-
-    match app_points {
-        Ok(points) => {
-            match get_app_with_most_ext(&points) {
-                Ok(generated_app) => {
-                    open_jetbrains_app(&current_directory, generated_app);
-                },
-                Err(inconclusive_message) => {
-                    println!("{}", inconclusive_message);
-                    let selected_app = get_selected_app(&jet_brains_apps);
-                    open_jetbrains_app(&current_directory, selected_app);
-                }
-            };
-        }
-        Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-    }
-    process::exit(0);
+    let app_points = get_app_points(path_arg, &jet_brains_apps)?;
+    println!("{:?}", app_points);
+    Ok(PathBuf::new())
+    //  return Ok(if let Ok(generated_app) = get_app_with_most_ext(&app_points) {
+    //     generated_app.get_path()
+    // } else {
+    //     println!("Scan inconclusive, please choose app: ");
+    //     get_selected_app(&jet_brains_apps).get_path()
+    // });
 }

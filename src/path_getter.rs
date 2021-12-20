@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::process;
 
-pub fn get_path() -> PathBuf {
+pub fn get_project_path() -> PathBuf {
     let args: Vec<String> = std::env::args().collect();
     if args.len() > 2 {
         eprintln!("1 argument expected, found {}", args.len());

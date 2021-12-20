@@ -16,6 +16,8 @@ mod config_tests {
         let installed_apps = vec![
             "rider", "intellij", "clion", "datagrip", "pycharm", "webstorm",
         ];
+
+
         let sut = get_apps(&installed_apps);
         assert_eq!(installed_apps.len(), sut.len())
     }
