@@ -20,6 +20,7 @@ pub fn jet(path_arg: &Path) -> Result<PathBuf, Box<dyn Error>> {
         "rider", "intellij", "clion", "datagrip", "pycharm", "webstorm",
     ]);
 
+
     let app_points = get_app_points(path_arg, &jet_brains_apps)?;
     println!("{:?}", app_points);
     Ok(PathBuf::new())

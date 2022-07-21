@@ -12,6 +12,7 @@ impl<'a> AppPoints<'a> {
     pub fn new(app: &'a JetBrainsApp) -> Self {
         let ext_score = AppPoints::app_ext_hashmaps(app);
         AppPoints { app_points: 0, ext_score }
+
     }
     
     fn app_ext_hashmaps(app: &'a JetBrainsApp) -> HashMap<&str, u32> {
